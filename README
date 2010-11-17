@@ -1,0 +1,11 @@
+mongrel2_wsgi
+-------------
+
+A Mongrel2 handler for WSGI applications based on Paste's copy of the
+CherryPy WSGI server and eventlet.
+
+This is a very early version, just to see what I could hack together to
+see whether Mongrel2 is interesting after all.
+
+On my machine, siege -b reports approximately 1800 transactions/second
+from the test application.

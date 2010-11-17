@@ -1,0 +1,13 @@
+syntax:glob
+*~
+.*
+*.pyc
+*.o
+*.so
+*.egg-info/*
+*.sqlite
+*.pid
+_build/*
+build/*
+logs/*
+run/*
