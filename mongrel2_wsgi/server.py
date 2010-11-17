@@ -290,7 +290,7 @@ class Mongrel2WSGIServer(wsgiserver.CherryPyWSGIServer):
     def tick(self):
         """Accept a new connection and put it on the Queue."""
         mongrel2_request = Request.parse(self.reqs.recv())
-        if not self.ready:
+        if (not self.ready) or mongrel2_request.is_disconnect():
             return
         conn = self.ConnectionClass(self, self.resp, mongrel2_request)
         self.requests.spawn_n(conn.communicate)
