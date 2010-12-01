@@ -1,15 +1,20 @@
 from setuptools import setup, find_packages
-import sys, os
 
-version = '0.2'
+version = '0.3'
 
 setup(name='mongrel2_wsgi',
       version=version,
       description="Mongrel2 handler to WSGI.",
       long_description="""\
-Mongrel2 to WSGI adapter based on CherryPy's WSGI server.
+A Mongrel2 handler for WSGI applications. Based on the CherryPy WSGI
+server, eventlet, and ZeroMQ. Supports streaming and chunked responses.
 """,
-      classifiers=[],
+      classifiers=[
+          "Development Status :: 3 - Alpha",
+          "License :: OSI Approved :: BSD License",
+          "Programming Language :: Python",
+          "Topic :: Internet :: WWW/HTTP :: WSGI :: Server",
+          ],
       keywords='wsgi mongrel2 eventlet',
       author='Daniel Holth',
       author_email='dholth@fastmail.fm',

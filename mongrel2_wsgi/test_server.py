@@ -5,7 +5,6 @@ Statement coverage tests for mongrel2_wsgi.server.
 from mongrel2_wsgi import server
 
 import urllib2
-from eventlet import spawn_n, sleep
 
 from wsgiref.simple_server import demo_app
 from wsgiref.validate import validator
@@ -84,7 +83,6 @@ def dont_test_bad_netstring():
     request_data = """ee3f2ae1-37e1-4866-a9bc-90cf5db31b9d 45965 / 2103:{"PATH":"/","user-agent":"Python-urllib/2.6","host":"localhost:6767","x-forwarded-for":"::1","connectionclose","accept-encoding":"identity","METHOD":"GET","VERSION":"HTTP/1.1","URI":"/","PATTERN":"/"},0:,"""
     s.reqs = MockRecv(request_data)
     s.tick()
-    sleep(0.1)
 
 def test_mrbs():
     s = create_test_server()
@@ -128,5 +126,6 @@ def test_read_headers():
     assert 'foo' in headers['Accept'], headers['Accept']
     assert 'bar' in headers['Accept'], headers['Accept']
     assert 'superman' not in headers['X-Men'], headers['X-Men']
+    assert 'wolverine' in headers['X-Men'], headers['X-Men']
     assert 'PATH' not in headers
 

@@ -13,11 +13,6 @@ import eventlet
 from eventlet.green import zmq
 
 try:
-    import simplejson as json
-except ImportError: # PRAGMA nocover
-    import json
-
-try:
     from cStringIO import StringIO
 except ImportError: # PRAGMA nocover
     from StringIO import StringIO
