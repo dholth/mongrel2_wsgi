@@ -14,12 +14,12 @@ from eventlet.green import zmq
 
 try:
     import simplejson as json
-except ImportError:
+except ImportError: # PRAGMA nocover
     import json
 
 try:
     from cStringIO import StringIO
-except ImportError:
+except ImportError: # PRAGMA nocover
     from StringIO import StringIO
 
 from mongrel2_wsgi.request import Request
@@ -32,7 +32,8 @@ ctx = zmq.Context()
 import logging
 log = logging.getLogger(__name__)
 
-comma_separated_headers = set(['Accept', 'Accept-Charset', 'Accept-Encoding',
+# Mongrel2 HTTP headers are all lowercase:
+comma_separated_headers = set(x.lower() for x in ['Accept', 'Accept-Charset', 'Accept-Encoding',
     'Accept-Language', 'Accept-Ranges', 'Allow', 'Cache-Control',
     'Connection', 'Content-Encoding', 'Content-Language', 'Expect',
     'If-Match', 'If-None-Match', 'Pragma', 'Proxy-Authenticate', 'TE',
@@ -60,16 +61,15 @@ class Mongrel2File(object):
     def close(self):
         self.connection.send(self.header + ' ')
 
-def read_headers(mongrel2_headers, hdict=None):
+def read_headers(mongrel2_headers, hdict={}):
     """Merge mongrel2's headers into hdict."""
-    if hdict is None:
-        hdict = {}
      
     for k, v in mongrel2_headers.items():
-        # mongrel2 HTTP headers are all lowercase.
+        # Mongrel2 HTTP headers are all lowercase. 
+        # Uppercase values are Mongrel2 variables.
         if not (k[0].islower() and '.' not in k): continue
         if isinstance(v, list):
-            if v in comma_separated_headers:
+            if k in comma_separated_headers:
                 v = ', '.join(v)
             else:
                 v = v[-1]
@@ -111,8 +111,7 @@ class Mongrel2Request(wsgiserver.HTTPRequest):
 
         scheme, authority, path = None, None, self.uri
 
-        if scheme:
-            self.scheme = scheme
+        if scheme: self.scheme = scheme
 
         qs = str(mongrel2_headers.get('QUERY', ''))
         self.qs = qs
@@ -148,6 +147,7 @@ class Mongrel2Request(wsgiserver.HTTPRequest):
         sp = int(self.server.protocol[5]), int(self.server.protocol[7])
         
         if sp[0] != rp[0]:
+            self.request_protocol = "HTTP/1.0" # prevent AttributeError
             self.simple_response("505 HTTP Version Not Supported")
             return
         self.request_protocol = req_protocol
@@ -159,7 +159,7 @@ class Mongrel2Request(wsgiserver.HTTPRequest):
         # then all the http headers
         try:
             read_headers(self.conn.mongrel2_request.headers, self.inheaders)
-        except ValueError, ex:
+        except ValueError, ex: # can read_headers raise this exception?
             self.simple_response("400 Bad Request", ex.args[0])
             return False
         
@@ -219,11 +219,11 @@ class Mongrel2Request(wsgiserver.HTTPRequest):
             # Don't use simple_response here, because it emits headers
             # we don't want. See http://www.cherrypy.org/ticket/951
             msg = self.server.protocol + " 100 Continue\r\n\r\n"
-            try:
-                self.conn.wfile.sendall(msg)
-            except socket.error, x:
-                if x.args[0] not in socket_errors_to_ignore:
-                    raise
+            # try:
+            self.conn.wfile.sendall(msg)
+            # except socket.error, x: # XXX which errors will ZeroMQ raise? import socket...
+            #    if x.args[0] not in socket_errors_to_ignore:
+            #        raise
         return True
 
 class Mongrel2Connection(wsgiserver.HTTPConnection):
